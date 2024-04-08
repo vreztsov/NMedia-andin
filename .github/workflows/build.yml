@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: '*'
   pull_request:
-    branches: [ master ]
+    branches: '*'
 
 jobs:
   build:
@@ -18,6 +18,11 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew build --info
+
+      - name: Decode google-services.json
+        env:
+          FIREBASE_SECRET: ${{ secrets.FIREBASE_SECRET }}
+        run: echo $FIREBASE_SECRET > ./app/google-services.json
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v2
