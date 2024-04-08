@@ -9,6 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 interface OnInteractionListener {
     fun onLike(post: Post) {}
@@ -39,11 +42,13 @@ class PostViewHolder(
     fun bind(post: Post) {
         binding.apply {
             author.text = post.author
-            published.text = post.published
+            val dateFormat = SimpleDateFormat("dd MMM yyyy HH:mm:ss", Locale.ENGLISH)
+            published.text = dateFormat.format(Date(post.published.toLong()*1000))
             content.text = post.content
             // в адаптере
             like.isChecked = post.likedByMe
             like.text = "${post.likes}"
+            avatar.setImageResource(R.drawable.ic_netology_original_48dp)
 
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
