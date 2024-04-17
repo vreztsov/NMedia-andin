@@ -1,6 +1,8 @@
 package ru.netology.nmedia.adapter
 
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
@@ -9,6 +11,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
@@ -49,6 +53,7 @@ class PostViewHolder(
     }
 
     fun bind(post: Post) {
+
         binding.apply {
             author.text = post.author
             val dateFormat = SimpleDateFormat("dd MMM yyyy HH:mm:ss", Locale.ENGLISH)
@@ -57,7 +62,6 @@ class PostViewHolder(
             // в адаптере
             like.isChecked = post.likedByMe
             like.text = "${post.likes}"
-//            avatar.setImageResource(R.drawable.ic_netology_original_48dp)
             val options: RequestOptions = RequestOptions.circleCropTransform()
             Glide.with(avatar)
                 .load(BASE_URL + AVATARS + "/${post.authorAvatar}")
@@ -67,17 +71,16 @@ class PostViewHolder(
                 .apply(options)
                 .into(avatar)
             if (post.attachment != null) {
-                Glide.with(image)
-                    .load(BASE_URL + IMAGES + "/${post.attachment.url}")
-                    .placeholder(R.drawable.ic_loading_100dp)
-                    .error(R.drawable.ic_error_100dp)
-                    .timeout(10_000)
-                    .into(image)
+                image.loadingWithGlide(
+                    BASE_URL + IMAGES + "/${post.attachment.url}",
+                    10_000,
+                    fullWidth = true
+                )
+                image.visibility = View.VISIBLE
             } else {
-                Glide.with(image)
-                    .clear(image)
+                image.visibility = View.GONE
             }
-            image.scaleType = ImageView.ScaleType.FIT_CENTER
+//            image.scaleType = ImageView.ScaleType.FIT_CENTER
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.options_post)
@@ -107,6 +110,51 @@ class PostViewHolder(
                 onInteractionListener.onShare(post)
             }
         }
+    }
+
+    fun ImageView.loadingWithGlide(
+        url: String,
+        timeOut: Int = 30_000,
+        placeholderIndex: Int = R.drawable.ic_loading_100dp,
+        errorIndex: Int = R.drawable.ic_error_100dp,
+        options: RequestOptions = RequestOptions(),
+        fullWidth: Boolean = false,
+    ) {
+
+        Glide.with(this)
+            .load(url)
+            .timeout(timeOut)
+            .placeholder(placeholderIndex)
+            .error(errorIndex)
+            .apply(options)
+            .apply {
+                if (fullWidth)
+                    this.into(object : CustomTarget<Drawable>() {
+                        override fun onResourceReady(
+                            resource: Drawable,
+                            transition: Transition<in Drawable>?
+                        ) {
+                            this@loadingWithGlide.setImageDrawable(resource)
+                            val layoutParams = this@loadingWithGlide.layoutParams
+                            val widthOriginal = resource.intrinsicWidth
+                            val heightOriginal = resource.intrinsicHeight
+
+                            val displayMetrics = context.resources.displayMetrics
+                            val screenWidth = displayMetrics.widthPixels
+                            layoutParams.width = screenWidth
+
+                            val calculatedHeight =
+                                (screenWidth.toFloat() / widthOriginal.toFloat() * heightOriginal).toInt()
+                            layoutParams.height = calculatedHeight
+                            this@loadingWithGlide.layoutParams = layoutParams
+                        }
+
+                        override fun onLoadCleared(placeholder: Drawable?) {
+                            this@loadingWithGlide.setImageDrawable(placeholder)
+                        }
+
+                    }) else this.into(this@loadingWithGlide)
+            }
     }
 
 

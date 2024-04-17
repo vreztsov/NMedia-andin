@@ -80,30 +80,18 @@
             app:layout_constraintTop_toBottomOf="@id/header"
             tools:text="@sample/posts.json/data/content" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/attachment"
+        <ImageView
+            android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="visible"
-            app:layout_constraintTop_toBottomOf="@id/content">
-
-            <ImageView
-                android:id="@+id/image"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:scaleType="center" />
-
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintTop_toBottomOf="@id/content" />
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/footer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="attachment" />
+            app:constraint_referenced_ids="image" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/like"
