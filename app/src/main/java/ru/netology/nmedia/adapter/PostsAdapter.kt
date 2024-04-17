@@ -2,6 +2,7 @@ package ru.netology.nmedia.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -44,6 +45,7 @@ class PostViewHolder(
     companion object {
         private const val BASE_URL = "http://10.0.2.2:9999"
         private const val AVATARS = "/avatars"
+        private const val IMAGES = "/images"
     }
 
     fun bind(post: Post) {
@@ -56,16 +58,26 @@ class PostViewHolder(
             like.isChecked = post.likedByMe
             like.text = "${post.likes}"
 //            avatar.setImageResource(R.drawable.ic_netology_original_48dp)
-            val url = BASE_URL + AVATARS + "/${post.authorAvatar}"
             val options: RequestOptions = RequestOptions.circleCropTransform()
             Glide.with(avatar)
-                .load(url)
+                .load(BASE_URL + AVATARS + "/${post.authorAvatar}")
                 .placeholder(R.drawable.ic_loading_100dp)
                 .error(R.drawable.ic_error_100dp)
                 .timeout(10_000)
                 .apply(options)
                 .into(avatar)
-
+            if (post.attachment != null) {
+                Glide.with(image)
+                    .load(BASE_URL + IMAGES + "/${post.attachment.url}")
+                    .placeholder(R.drawable.ic_loading_100dp)
+                    .error(R.drawable.ic_error_100dp)
+                    .timeout(10_000)
+                    .into(image)
+            } else {
+                Glide.with(image)
+                    .clear(image)
+            }
+            image.scaleType = ImageView.ScaleType.FIT_CENTER
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.options_post)
