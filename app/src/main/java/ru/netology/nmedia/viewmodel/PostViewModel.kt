@@ -27,8 +27,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val data: LiveData<FeedModel>
         get() = _data
     val edited = MutableLiveData(empty)
-    private val _postCreated = SingleLiveEvent<Unit>()
-    val postCreated: LiveData<Unit>
+    private val _postCreated = SingleLiveEvent<FeedModel>()
+    val postCreated: LiveData<FeedModel>
         get() = _postCreated
 
     init {
@@ -52,10 +52,10 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         edited.value?.let {
             repository.saveAsync(it, object : PostRepository.Callback<Unit> {
                 override fun onSuccess(result: Unit) {
-                    _postCreated.postValue(result)
+                    _postCreated.postValue(FeedModel())
                 }
                 override fun onError(e: Exception) {
-                    _postCreated.postValue(Unit)
+                    _postCreated.postValue(FeedModel(error = true))
                 }
             })
         }
@@ -88,6 +88,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             }
             override fun onError(e: Exception) {
                 _data.postValue(_data.value?.copy(posts = old))
+                _data.postValue(FeedModel(error = true))
             }
         })
     }
@@ -106,6 +107,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
             override fun onError(e: Exception) {
                 _data.postValue(_data.value?.copy(posts = old))
+                _data.postValue(FeedModel(error = true))
             }
         })
     }
