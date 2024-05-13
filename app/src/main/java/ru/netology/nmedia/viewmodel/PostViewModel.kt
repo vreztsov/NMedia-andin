@@ -75,7 +75,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun likeById(id: Long) {
-        val old = _data.value?.posts.orEmpty()
         repository.likeByIdAsync(id, object : PostRepository.Callback<Unit> {
             override fun onSuccess(result: Unit) {
                 _data.postValue(_data.value?.copy(posts = _data.value?.posts.orEmpty().map {
@@ -87,7 +86,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }))
             }
             override fun onError(e: Exception) {
-                _data.postValue(_data.value?.copy(posts = old))
                 _data.postValue(FeedModel(error = true))
             }
         })
@@ -95,7 +93,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun removeById(id: Long) {
         // Оптимистичная модель
-        val old = _data.value?.posts.orEmpty()
         repository.removeByIdAsync(id, object : PostRepository.Callback<Unit> {
             override fun onSuccess(result: Unit) {
                 _data.postValue(
@@ -106,7 +103,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             override fun onError(e: Exception) {
-                _data.postValue(_data.value?.copy(posts = old))
                 _data.postValue(FeedModel(error = true))
             }
         })
