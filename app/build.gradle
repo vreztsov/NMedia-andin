@@ -29,6 +29,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
 
     buildTypes {
@@ -36,9 +37,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             manifestPlaceholders.usesCleartextTraffic = false
+            buildConfigField "String", "BASE_URL", '"https://netomedia.ru"'
         }
         debug {
             manifestPlaceholders.usesCleartextTraffic = true
+            buildConfigField "String", "BASE_URL", '"http://10.0.2.2:9999"'
         }
     }
 }
@@ -59,6 +62,7 @@ dependencies {
     def room_version = "2.6.0-alpha02"
     def firebase_version = "32.8.0"
     def okhttp_version = "4.12.0"
+    def retrofit_version = "2.10.0"
     def play_services_base_version = "18.1.0"
     def swiperefreshlayout_version = "1.1.0"
     def glide_version = "4.16.0"
@@ -82,7 +86,9 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     implementation platform("com.google.firebase:firebase-bom:$firebase_version")
     implementation "com.google.firebase:firebase-messaging-ktx"
-    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     implementation "com.google.android.gms:play-services-base:$play_services_base_version"
     implementation "com.github.bumptech.glide:glide:$glide_version"
 
