@@ -71,6 +71,10 @@ class FeedFragment : Fragment() {
                     .show()
             }
         }
+        viewModel.newerCount.observe(viewLifecycleOwner) { state ->
+            // TODO: just log it, interaction must be in homework
+            println(state)
+        }
 
         binding.retryButton.setOnClickListener {
             viewModel.loadPosts()
