@@ -72,8 +72,15 @@ class FeedFragment : Fragment() {
             }
         }
         viewModel.newerCount.observe(viewLifecycleOwner) { state ->
-            // TODO: just log it, interaction must be in homework
+            binding.newer.visibility = View.VISIBLE
             println(state)
+        }
+
+        binding.newer.setOnClickListener {
+            viewModel.showNewPosts()
+            viewModel.loadPosts()
+            binding.newer.visibility = View.GONE
+            binding.list.smoothScrollToPosition(0)
         }
 
         binding.retryButton.setOnClickListener {

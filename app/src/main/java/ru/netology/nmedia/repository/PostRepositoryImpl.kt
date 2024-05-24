@@ -38,7 +38,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(body.toEntity())
+            dao.insert(body.onEach { it.isVisible = true }.toEntity())
             clearRetryFun()
         } catch (e: IOException) {
             retryFun = RetryInterface {
@@ -129,6 +129,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         dao.removeById(id)
         removeByIdOnServer(id)
     }
+
     private suspend fun removeByIdOnServer(id: Long) {
         try {
             val response = PostsApi.retrofitService.removeById(id)
@@ -148,6 +149,10 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
             }
             throw UnknownError
         }
+    }
+
+    override fun showNewPosts() {
+        dao.showNewPosts()
     }
 }
 

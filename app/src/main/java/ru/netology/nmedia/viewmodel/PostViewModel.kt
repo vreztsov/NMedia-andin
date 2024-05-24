@@ -129,4 +129,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             _dataState.value = FeedModelState(error = true)
         }
     }
+
+    fun showNewPosts() {
+        repository.showNewPosts()
+    }
 }
