@@ -14,7 +14,9 @@ import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
+import ru.netology.nmedia.dto.AttachmentType
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.util.ARG_POST_ID
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class FeedFragment : Fragment() {
@@ -51,6 +53,18 @@ class FeedFragment : Fragment() {
                 val shareIntent =
                     Intent.createChooser(intent, getString(R.string.chooser_share_post))
                 startActivity(shareIntent)
+            }
+
+            override fun onImageClick(post: Post) {
+                if (post.attachment?.type == AttachmentType.IMAGE) {
+                    findNavController().navigate(
+                        R.id.action_feedFragment_to_imageFragment,
+                        Bundle().apply {
+                            putLong(ARG_POST_ID, post.id)
+                        }
+                    )
+                }
+
             }
         })
         binding.list.adapter = adapter
