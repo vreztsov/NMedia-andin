@@ -25,6 +25,7 @@ interface OnInteractionListener {
     fun onEdit(post: Post) {}
     fun onRemove(post: Post) {}
     fun onShare(post: Post) {}
+    fun onImageClick(post: Post) {}
 }
 
 class PostsAdapter(
@@ -49,7 +50,7 @@ class PostViewHolder(
     companion object {
         private const val BASE_URL = "http://10.0.2.2:9999"
         private const val AVATARS = "/avatars"
-        private const val IMAGES = "/images"
+        private const val MEDIA = "/media"
     }
 
     fun bind(post: Post) {
@@ -72,7 +73,7 @@ class PostViewHolder(
                 .into(avatar)
             if (post.attachment != null) {
                 image.loadingWithGlide(
-                    BASE_URL + IMAGES + "/${post.attachment.url}",
+                    BASE_URL + MEDIA + "/${post.attachment.url}",
                     10_000,
                     fullWidth = true
                 )
@@ -80,7 +81,6 @@ class PostViewHolder(
             } else {
                 image.visibility = View.GONE
             }
-//            image.scaleType = ImageView.ScaleType.FIT_CENTER
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.options_post)
@@ -100,6 +100,10 @@ class PostViewHolder(
                         }
                     }
                 }.show()
+            }
+
+            image.setOnClickListener {
+                onInteractionListener.onImageClick(post)
             }
 
             like.setOnClickListener {
