@@ -17,6 +17,7 @@ import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.AttachmentType
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.util.ARG_POST_ID
+import ru.netology.nmedia.util.goToLogin
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class FeedFragment : Fragment() {
@@ -36,6 +37,10 @@ class FeedFragment : Fragment() {
             }
 
             override fun onLike(post: Post) {
+                if (!viewModel.isAuthorized) {
+                    goToLogin(this@FeedFragment)
+                    return
+                }
                 viewModel.likeById(post.id)
             }
 
@@ -107,7 +112,11 @@ class FeedFragment : Fragment() {
         }
 
         binding.fab.setOnClickListener {
-            findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+            if (viewModel.isAuthorized) {
+                findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+            } else {
+                goToLogin(this)
+            }
         }
 
         return binding.root

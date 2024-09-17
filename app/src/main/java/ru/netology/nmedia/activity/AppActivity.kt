@@ -1,6 +1,7 @@
 package ru.netology.nmedia.activity
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -20,6 +21,10 @@ import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.viewmodel.AuthViewModel
 import androidx.activity.viewModels
 import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.util.AndroidUtils
+import ru.netology.nmedia.util.getCurrentFragment
+import ru.netology.nmedia.util.getRootFragment
+import ru.netology.nmedia.util.goToLogin
 
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
 
@@ -66,28 +71,43 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                 }
             }
 
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
-                when (menuItem.itemId) {
-                    R.id.signin -> {
-                        // TODO: just hardcode it, implementation must be in homework
-                        AppAuth.getInstance().setAuth(5, "x-token")
-                        true
-                    }
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
 
-                    R.id.signup -> {
-                        // TODO: just hardcode it, implementation must be in homework
-                        AppAuth.getInstance().setAuth(5, "x-token")
+                val currentFragment = supportFragmentManager.getCurrentFragment()
+                val rootFragment = supportFragmentManager.getRootFragment()
+
+                return when (menuItem.itemId) {
+                    R.id.signin, R.id.signup -> {
+                        if (currentFragment != null) {
+                            goToLogin(currentFragment)
+                        }
                         true
                     }
 
                     R.id.signout -> {
-                        // TODO: just hardcode it, implementation must be in homework
-                        AppAuth.getInstance().removeAuth()
+                        if (currentFragment != null) {
+                            AndroidUtils.hideKeyboard(currentFragment.requireView())
+                            val builder: AlertDialog.Builder =
+                                AlertDialog.Builder(this@AppActivity)
+                            builder
+                                .setMessage(getString(R.string.logout_confirm_request))
+                                .setTitle(getString(R.string.action_confirm_title))
+                                .setPositiveButton(getString(R.string.action_continue)) { dialog, which ->
+                                    AppAuth.getInstance().removeAuth()
+                                    if (currentFragment is NewPostFragment) {
+                                        rootFragment.navController.navigateUp()
+                                    }
+                                }
+                                .setNegativeButton(getString(R.string.action_cancel)) { dialog, which -> }
+                            val dialog: AlertDialog = builder.create()
+                            dialog.show()
+                        }
                         true
                     }
 
                     else -> false
                 }
+            }
         })
 
     }
