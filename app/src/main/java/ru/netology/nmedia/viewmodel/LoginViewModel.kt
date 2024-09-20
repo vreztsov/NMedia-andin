@@ -91,7 +91,7 @@ class LoginViewModel : ViewModel() {
         val warnIdSet = mutableSetOf<Int>()
 
         loginInfo.value?.let {
-            if (it.login.isEmpty()) {
+            if (it.login.isBlank()) {
                 warnIdSet.add(R.string.warning_no_login)
             }
             if (it.password.isEmpty()) {

@@ -41,4 +41,10 @@
     <string name="logout_confirm_request">You are going \nto log off</string>
     <string name="error_no_authorization">You cannot create posts being anonymus</string>
     <string name="action_confirm_title">Action confirming</string>
+    <string name="prompt_username">Username</string>
+    <string name="prompt_password_repeat">Repeat password</string>
+    <string name="action_register">Register</string>
+    <string name="warning_no_username">No username</string>
+    <string name="warning_no_matching_password">Password does not match</string>
+
 </resources>

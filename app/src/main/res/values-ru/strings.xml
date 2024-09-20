@@ -42,4 +42,9 @@
     <string name="logout_confirm_request">Переход в \nанонимный \nрежим</string>
     <string name="error_no_authorization">Вы не можете создавать посты анонимно</string>
     <string name="action_confirm_title">Action confirming</string>
+    <string name="prompt_username">Имя</string>
+    <string name="prompt_password_repeat">Повторить пароль</string>
+    <string name="action_register">Зарегистрироваться</string>
+    <string name="warning_no_username">Пустое имя</string>
+    <string name="warning_no_matching_password">Пароль не совпадает</string>
 </resources>

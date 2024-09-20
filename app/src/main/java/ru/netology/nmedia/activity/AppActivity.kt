@@ -25,6 +25,7 @@ import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.util.getCurrentFragment
 import ru.netology.nmedia.util.getRootFragment
 import ru.netology.nmedia.util.goToLogin
+import ru.netology.nmedia.util.goToRegister
 
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
 
@@ -77,9 +78,16 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                 val rootFragment = supportFragmentManager.getRootFragment()
 
                 return when (menuItem.itemId) {
-                    R.id.signin, R.id.signup -> {
+                    R.id.signin -> {
                         if (currentFragment != null) {
                             goToLogin(currentFragment)
+                        }
+                        true
+                    }
+
+                    R.id.signup -> {
+                        if (currentFragment != null) {
+                            goToRegister(currentFragment)
                         }
                         true
                     }
