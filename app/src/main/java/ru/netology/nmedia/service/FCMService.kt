@@ -38,12 +38,33 @@ class FCMService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-
-        message.data[action]?.let {
-           when (Action.valueOf(it)) {
-              Action.LIKE -> handleLike(gson.fromJson(message.data[content], Like::class.java))
-           }
+        println("message received : ")
+        message.data[content]?.let {
+            val simpleInfo = gson.fromJson(
+                message.data[content],
+                SimpleInfo::class.java
+            )
+            val userId = AppAuth.getInstance().authStateFlow.value.id
+            println("userId=")
+            when {
+                (simpleInfo.recipientId == null) -> handleSimple(simpleInfo)
+                (simpleInfo.recipientId == userId) -> handleSimple(simpleInfo)
+                else -> {
+                    AppAuth.getInstance().sendPushToken()
+                }
+            }
         }
+    }
+
+    private fun handleSimple(simpleInfo: SimpleInfo) {
+        val notification = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(
+                getString(R.string.notification_info).plus(simpleInfo.content)
+            )
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .build()
+        notify(notification)
     }
 
     override fun onNewToken(token: String) {
@@ -89,5 +110,10 @@ data class Like(
     val userName: String,
     val postId: Long,
     val postAuthor: String,
+)
+
+data class SimpleInfo(
+    val recipientId: Long?,
+    val content: String,
 )
 
