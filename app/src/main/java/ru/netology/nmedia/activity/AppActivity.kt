@@ -10,26 +10,33 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
 import androidx.navigation.findNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
-import ru.netology.nmedia.viewmodel.AuthViewModel
-import androidx.activity.viewModels
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.util.getCurrentFragment
 import ru.netology.nmedia.util.getRootFragment
 import ru.netology.nmedia.util.goToLogin
 import ru.netology.nmedia.util.goToRegister
+import ru.netology.nmedia.viewmodel.AuthViewModel
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
 
-    private val viewModel: AuthViewModel by viewModels()
+    @Inject
+    lateinit var appAuth: AppAuth
+
+    private val viewModel: AuthViewModel by viewModels(
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -101,7 +108,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                                 .setMessage(getString(R.string.logout_confirm_request))
                                 .setTitle(getString(R.string.action_confirm_title))
                                 .setPositiveButton(getString(R.string.action_continue)) { dialog, which ->
-                                    AppAuth.getInstance().removeAuth()
+                                    appAuth.removeAuth()
                                     if (currentFragment is NewPostFragment) {
                                         rootFragment.navController.navigateUp()
                                     }

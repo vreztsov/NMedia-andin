@@ -4,20 +4,26 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import ru.netology.nmedia.R
-import ru.netology.nmedia.api.PostsApi
+import ru.netology.nmedia.api.PostsApiService
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.auth.AuthState
 import ru.netology.nmedia.auth.RegisterInfo
 import ru.netology.nmedia.util.SingleLiveEvent
+import javax.inject.Inject
 
-class RegisterViewModel : ViewModel() {
+@HiltViewModel
+class RegisterViewModel @Inject constructor(
+    private val apiService: PostsApiService,
+    private val appAuth: AppAuth
+) : ViewModel() {
 
     val isAuthorized: Boolean
-        get() = AppAuth.getInstance().authStateFlow.value.id != 0L
+        get() = appAuth.authStateFlow.value.id != 0L
 
     private val _registerSuccessEvent = SingleLiveEvent<Unit>()
     val registerSuccessEvent: LiveData<Unit>
@@ -66,7 +72,7 @@ class RegisterViewModel : ViewModel() {
     private suspend fun registerUser() {
         var response: Response<AuthState>? = null
         try {
-            response = PostsApi.retrofitService.registerUser(
+            response = apiService.registerUser(
                 registerInfo.value?.login ?: "",
                 registerInfo.value?.password ?: "",
                 registerInfo.value?.username ?: "",
@@ -81,7 +87,7 @@ class RegisterViewModel : ViewModel() {
             throw RuntimeException("Request declined: $errText")
         }
         val responseToken = response.body() ?: throw RuntimeException("body is null")
-        AppAuth.getInstance().setAuth(
+        appAuth.setAuth(
             responseToken.id,
             responseToken.token ?: throw RuntimeException("token is null")
         )
