@@ -4,20 +4,26 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.Response
-import ru.netology.nmedia.api.PostsApi
+import ru.netology.nmedia.R
+import ru.netology.nmedia.api.PostsApiService
 import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.auth.AuthState
 import ru.netology.nmedia.auth.LoginInfo
 import ru.netology.nmedia.util.SingleLiveEvent
-import ru.netology.nmedia.R
-import ru.netology.nmedia.auth.AuthState
+import javax.inject.Inject
 
-class LoginViewModel : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val apiService: PostsApiService,
+    private val appAuth: AppAuth
+) : ViewModel() {
 
     val isAuthorized: Boolean
-        get() = AppAuth.getInstance().authStateFlow.value.id != 0L
+        get() = appAuth.authStateFlow.value.id != 0L
 
     private val _loginSuccessEvent = SingleLiveEvent<Unit>()
     val loginSuccessEvent: LiveData<Unit>
@@ -65,7 +71,7 @@ class LoginViewModel : ViewModel() {
     private suspend fun updateUser() {
         val response: Response<AuthState>?
         try {
-            response = PostsApi.retrofitService.updateUser(
+            response = apiService.updateUser(
                 loginInfo.value?.login ?: "",
                 loginInfo.value?.password ?: ""
             )
@@ -81,7 +87,7 @@ class LoginViewModel : ViewModel() {
         }
         val authState = response.body() ?: throw RuntimeException("body is null")
 
-        AppAuth.getInstance().setAuth(authState.id, authState.token ?: throw RuntimeException("token is null"))
+        appAuth.setAuth(authState.id, authState.token ?: throw RuntimeException("token is null"))
 
     }
 
