@@ -1,17 +1,17 @@
 package ru.netology.nmedia.activity
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.databinding.FragmentImageBinding
 import ru.netology.nmedia.util.ARG_POST_ID
-import ru.netology.nmedia.viewmodel.PostViewModel
 import ru.netology.nmedia.util.loadImage
+import ru.netology.nmedia.viewmodel.PostViewModel
 
 @AndroidEntryPoint
 class ImageFragment : Fragment() {
@@ -32,9 +32,10 @@ class ImageFragment : Fragment() {
         )
 
         val currentPostId = arguments?.getLong(ARG_POST_ID) ?: 0
-        val post = viewModel.data.value?.posts?.first {
-            it.id == currentPostId
-        }
+//        val post = viewModel.data.value?.posts?.first {
+//            it.id == currentPostId
+//        }
+        val post = viewModel.emptyPostForCurrentUser() // пока вот так
 
         loadImage(post, binding.photo)
 
