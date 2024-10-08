@@ -27,6 +27,7 @@ import ru.netology.nmedia.util.getRootFragment
 import ru.netology.nmedia.util.goToLogin
 import ru.netology.nmedia.util.goToRegister
 import ru.netology.nmedia.viewmodel.AuthViewModel
+import ru.netology.nmedia.viewmodel.PostViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -42,6 +43,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
     lateinit var googleApiAvailability: GoogleApiAvailability
 
     private val viewModel: AuthViewModel by viewModels()
+    private val postViewModel: PostViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -69,6 +71,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
 
         viewModel.data.observe(this) {
             invalidateOptionsMenu()
+            postViewModel.refreshPosts()
         }
 
         checkGoogleApiAvailability()
