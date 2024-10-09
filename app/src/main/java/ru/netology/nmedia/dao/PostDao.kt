@@ -41,4 +41,13 @@ interface PostDao {
     suspend fun removeById(id: Long)
     @Query("UPDATE PostEntity SET isVisible = 1 WHERE isVisible == 0")
     fun showNewPosts()
+
+    @Query("SELECT * FROM PostEntity WHERE isVisible == 1 ORDER BY id DESC LIMIT :count")
+    fun getLatest(count: Int): List<PostEntity>
+
+    @Query("SELECT * FROM (SELECT * FROM PostEntity WHERE (isVisible == 1 AND id < :id)) ORDER BY id DESC LIMIT :count")
+    fun getBefore(id: Long, count: Int): List<PostEntity>
+
+    @Query("SELECT * FROM PostEntity WHERE (isVisible == 1 AND id > :id) ORDER BY id")
+    fun getNewer(id: Long): List<PostEntity>
 }
