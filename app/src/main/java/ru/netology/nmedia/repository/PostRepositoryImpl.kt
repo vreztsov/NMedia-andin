@@ -30,7 +30,7 @@ import javax.inject.Inject
 class PostRepositoryImpl @Inject constructor(
     private val dao: PostDao,
     private val apiService: PostsApiService
-) : PostRepository {
+) : AbstractPostRepository() {
 
     override val data = Pager(
         config = PagingConfig(pageSize = 10, enablePlaceholders = false),
@@ -38,15 +38,6 @@ class PostRepositoryImpl @Inject constructor(
             PostPagingSource(apiService)
         }
     ).flow
-    private var retryFun: RetryInterface? = null
-
-    private fun clearRetryFun() {
-        retryFun = null
-    }
-
-    override suspend fun retry() {
-        retryFun?.retry()
-    }
 
     override suspend fun getAll() {
         try {
@@ -140,21 +131,6 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveWithAttachment(post: Post, upload: MediaUpload) {
-        try {
-            val media = upload(upload)
-            // TODO: add support for other types
-            val postWithAttachment = post.copy(attachment = Attachment(media.id, AttachmentType.IMAGE))
-            save(postWithAttachment)
-        } catch (e: AppError) {
-            throw e
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
-    }
-
     override suspend fun upload(upload: MediaUpload): Media {
         try {
             val media = MultipartBody.Part.createFormData(
@@ -200,11 +176,21 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun saveWithAttachment(post: Post, upload: MediaUpload) {
+        try {
+            val media = upload(upload)
+            val postWithAttachment = post.copy(attachment = Attachment(media.id, AttachmentType.IMAGE))
+            save(postWithAttachment)
+        } catch (e: AppError) {
+            throw e
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
     override fun showNewPosts() {
         dao.showNewPosts()
     }
-}
-
-fun interface RetryInterface {
-    suspend fun retry()
 }
