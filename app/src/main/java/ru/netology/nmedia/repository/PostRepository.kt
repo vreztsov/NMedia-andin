@@ -8,7 +8,7 @@ import ru.netology.nmedia.dto.Post
 
 interface PostRepository {
     val data: Flow<PagingData<Post>>
-    suspend fun getAll()
+    suspend fun getInitialPostPage()
     fun getNewerCount(id: Long): Flow<Int>
     suspend fun likeById(id: Long)
     suspend fun save(post: Post)
@@ -16,8 +16,10 @@ interface PostRepository {
     suspend fun upload(upload: MediaUpload): Media
     suspend fun removeById(id: Long)
     suspend fun retry()
-
-
     fun showNewPosts()
+
+    companion object {
+        const val pageSize = 10
+    }
 
 }
