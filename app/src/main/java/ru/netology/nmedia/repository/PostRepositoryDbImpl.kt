@@ -15,6 +15,7 @@ import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.error.UnknownError
+import ru.netology.nmedia.repository.PostRepository.Companion.pageSize
 import javax.inject.Inject
 
 class PostRepositoryDbImpl @Inject constructor(
@@ -28,8 +29,8 @@ class PostRepositoryDbImpl @Inject constructor(
         }
     ).flow
 
-    override suspend fun getAll() {
-        dao.getAll()
+    override suspend fun getInitialPostPage() {
+        dao.getLatest(pageSize)
     }
 
     override fun getNewerCount(id: Long): Flow<Int> = flow {
