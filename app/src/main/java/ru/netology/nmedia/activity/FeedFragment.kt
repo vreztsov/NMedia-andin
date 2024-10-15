@@ -16,6 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInteractionListener
+import ru.netology.nmedia.adapter.PagingLoadStateAdapter
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.AttachmentType
@@ -77,7 +78,15 @@ class FeedFragment : Fragment() {
 
             }
         })
-        binding.list.adapter = adapter
+        val retryListener = object : PagingLoadStateAdapter.OnInteractionListener {
+            override fun onRetry() {
+                adapter.retry()
+            }
+        }
+        binding.list.adapter = adapter.withLoadStateHeaderAndFooter(
+            header = PagingLoadStateAdapter(retryListener),
+            footer = PagingLoadStateAdapter(retryListener),
+        )
         binding.errorGroup.visibility = View.GONE
         lifecycleScope.launchWhenCreated {
             viewModel.data.collectLatest {

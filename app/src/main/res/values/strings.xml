@@ -47,5 +47,6 @@
     <string name="warning_no_username">No username</string>
     <string name="warning_no_matching_password">Password does not match</string>
     <string name="notification_info">Information:</string>
+    <string name="ad_description">ad</string>
 
 </resources>
