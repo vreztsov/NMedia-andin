@@ -3,16 +3,16 @@ package ru.netology.nmedia.repository
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ru.netology.nmedia.dao.PostDao
-import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.dto.FeedItem
 import ru.netology.nmedia.entity.toDto
 import java.io.IOException
 
 class PostDbPagingSource(
     private val postDao: PostDao
-) : PagingSource<Long, Post>() {
-    override fun getRefreshKey(state: PagingState<Long, Post>): Long? = null
+) : PagingSource<Long, FeedItem>() {
+    override fun getRefreshKey(state: PagingState<Long, FeedItem>): Long? = null
 
-    override suspend fun load(params: LoadParams<Long>): LoadResult<Long, Post> {
+    override suspend fun load(params: LoadParams<Long>): LoadResult<Long, FeedItem> {
         try {
             val result = when (params) {
                 is LoadParams.Refresh -> {

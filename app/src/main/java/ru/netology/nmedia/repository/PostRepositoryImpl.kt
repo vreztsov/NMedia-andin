@@ -1,5 +1,7 @@
 package ru.netology.nmedia.repository
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -20,6 +22,7 @@ import ru.netology.nmedia.dao.PostRemoteKeyDao
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.AttachmentType
+import ru.netology.nmedia.dto.FeedItem
 import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.dto.Post
@@ -43,8 +46,9 @@ class PostRepositoryImpl @Inject constructor(
     appDb: AppDb
 ) : AbstractPostRepository() {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalPagingApi::class)
-    override val data: Flow<PagingData<Post>> = Pager(
+    override val data: Flow<PagingData<FeedItem>> = Pager(
         config = PagingConfig(pageSize = pageSize, enablePlaceholders = false),
         pagingSourceFactory = { postDao.getPagingSource() },
         remoteMediator = PostRemoteMediator(
@@ -54,7 +58,10 @@ class PostRepositoryImpl @Inject constructor(
             appDb = appDb,
         )
     ).flow
-        .map { it.map(PostEntity::toDto) }
+        .map {
+            it.map(PostEntity::toDto)
+        }
+
 
     override suspend fun getInitialPostPage() {
         try {
