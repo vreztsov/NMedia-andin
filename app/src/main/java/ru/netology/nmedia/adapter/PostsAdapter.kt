@@ -17,9 +17,11 @@ import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardAdBinding
 import ru.netology.nmedia.databinding.CardPostBinding
+import ru.netology.nmedia.databinding.TimingSeparatorBinding
 import ru.netology.nmedia.dto.Ad
 import ru.netology.nmedia.dto.FeedItem
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.dto.TimingSeparator
 import ru.netology.nmedia.view.load
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -41,6 +43,7 @@ class PostsAdapter(
         when (getItem(position)) {
             is Ad -> R.layout.card_ad
             is Post -> R.layout.card_post
+            is TimingSeparator -> R.layout.timing_separator
             null -> error("unknown item type")
         }
 
@@ -52,10 +55,22 @@ class PostsAdapter(
                 CardAdBinding.inflate(layoutInflater, parent, false),
                 onInteractionListener
             )
+
             R.layout.card_post -> PostViewHolder(
                 CardPostBinding.inflate(layoutInflater, parent, false),
                 onInteractionListener
             )
+
+            R.layout.timing_separator -> {
+                val binding =
+                    TimingSeparatorBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    )
+                TimingSeparatorViewHolder(binding)
+            }
+
             else -> error("unknown view type: $viewType")
         }
     }
@@ -65,9 +80,18 @@ class PostsAdapter(
             when (it) {
                 is Post -> (holder as? PostViewHolder)?.bind(it)
                 is Ad -> (holder as? AdViewHolder)?.bind(it)
+                is TimingSeparator -> (holder as? TimingSeparatorViewHolder)?.bind(it)
                 null -> error("unknown item type")
             }
         }
+    }
+}
+
+class TimingSeparatorViewHolder(
+    private val binding: TimingSeparatorBinding,
+) : RecyclerView.ViewHolder(binding.root) {
+    fun bind(timingSeparator: TimingSeparator) {
+        binding.howOlder.text = timingSeparator.text
     }
 }
 

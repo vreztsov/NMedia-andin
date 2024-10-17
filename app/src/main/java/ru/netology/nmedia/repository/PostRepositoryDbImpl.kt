@@ -7,7 +7,6 @@ import androidx.paging.PagingData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.AttachmentType
@@ -31,9 +30,6 @@ class PostRepositoryDbImpl @Inject constructor(
             PostDbPagingSource(dao)
         }
     ).flow
-        .map {
-            it.insertSeparators()
-        }
 
     override suspend fun getInitialPostPage() {
         dao.getLatest(pageSize)

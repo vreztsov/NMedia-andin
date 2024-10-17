@@ -25,4 +25,10 @@ data class Ad(
 ) : FeedItem
 
 
+data class TimingSeparator(
+    override val id: Long,
+    val text: String,
+) : FeedItem
+
+
 

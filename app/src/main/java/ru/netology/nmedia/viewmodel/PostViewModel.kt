@@ -1,6 +1,8 @@
 package ru.netology.nmedia.viewmodel
 
 import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,6 +23,7 @@ import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.model.PhotoModel
 import ru.netology.nmedia.repository.PostRepository
+import ru.netology.nmedia.repository.insertSeparators
 import ru.netology.nmedia.util.SingleLiveEvent
 import java.io.File
 import javax.inject.Inject
@@ -44,15 +47,19 @@ class PostViewModel @Inject constructor(
     private val appAuth: AppAuth
 ) : ViewModel() {
 
-    private val cached = repository.data.cachedIn(viewModelScope)
+    @RequiresApi(Build.VERSION_CODES.O)
+    private val cached = repository.data
+        .map { it.insertSeparators() }
+        .cachedIn(viewModelScope)
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalCoroutinesApi::class)
     val data: Flow<PagingData<FeedItem>> = appAuth
         .authStateFlow
         .flatMapLatest { (myId, _) ->
             cached.map { pagingData ->
                 pagingData.map { post ->
-                    if (post is Post){
+                    if (post is Post) {
                         post.copy(ownedByMe = post.authorId == myId)
                     } else {
                         post

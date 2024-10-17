@@ -1,5 +1,7 @@
 package ru.netology.nmedia.repository
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -44,6 +46,7 @@ class PostRepositoryImpl @Inject constructor(
     appDb: AppDb
 ) : AbstractPostRepository() {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalPagingApi::class)
     override val data: Flow<PagingData<FeedItem>> = Pager(
         config = PagingConfig(pageSize = pageSize, enablePlaceholders = false),
@@ -55,9 +58,8 @@ class PostRepositoryImpl @Inject constructor(
             appDb = appDb,
         )
     ).flow
-        .map { it
-            .map(PostEntity::toDto)
-            .insertSeparators()
+        .map {
+            it.map(PostEntity::toDto)
         }
 
 
