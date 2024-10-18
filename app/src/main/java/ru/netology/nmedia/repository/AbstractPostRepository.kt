@@ -30,17 +30,20 @@ fun PagingData<out FeedItem>.insertSeparators(): PagingData<FeedItem> =
         val currentTime = Instant.now().epochSecond
         val today = "Сегодня"
         val yesterday = "Вчера"
+        val twoDaysAgo = "Позавчера"
         val lastWeek = "На прошлой неделе"
         if ((previous is Post && next is Post)) {
             val howOlderPrev = agoToText(
                 (currentTime - previous.published.toLong()).toInt(),
                 inLastWeekTextDescription = lastWeek,
+                inTwoDaysAgoTextDescription = twoDaysAgo,
                 inYesterdayTextDescription = yesterday,
                 inTodayTextDescription = today,
             )
             val howOlderNext = agoToText(
                 (currentTime - next.published.toLong()).toInt(),
                 inLastWeekTextDescription = lastWeek,
+                inTwoDaysAgoTextDescription = twoDaysAgo,
                 inYesterdayTextDescription = yesterday,
                 inTodayTextDescription = today,
             )
