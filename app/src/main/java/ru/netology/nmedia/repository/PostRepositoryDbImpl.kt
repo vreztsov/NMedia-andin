@@ -3,12 +3,14 @@ package ru.netology.nmedia.repository
 import androidx.core.net.toUri
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.AttachmentType
+import ru.netology.nmedia.dto.FeedItem
 import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.dto.Post
@@ -22,8 +24,8 @@ class PostRepositoryDbImpl @Inject constructor(
     private val dao: PostDao,
 ) : AbstractPostRepository() {
 
-    override val data = Pager(
-        config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+    override val data: Flow<PagingData<FeedItem>> = Pager(
+        config = PagingConfig(pageSize = pageSize, enablePlaceholders = false),
         pagingSourceFactory = {
             PostDbPagingSource(dao)
         }
@@ -56,7 +58,8 @@ class PostRepositoryDbImpl @Inject constructor(
     override suspend fun saveWithAttachment(post: Post, upload: MediaUpload) {
         try {
             val uri = upload.file.toUri()
-            val postWithAttachment = post.copy(attachment = Attachment(uri.toString(), AttachmentType.IMAGE))
+            val postWithAttachment =
+                post.copy(attachment = Attachment(uri.toString(), AttachmentType.IMAGE))
             save(postWithAttachment)
         } catch (e: AppError) {
             throw e

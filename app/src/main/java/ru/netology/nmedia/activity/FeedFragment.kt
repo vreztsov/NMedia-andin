@@ -1,10 +1,12 @@
 package ru.netology.nmedia.activity
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -16,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInteractionListener
+import ru.netology.nmedia.adapter.PagingLoadStateAdapter
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.AttachmentType
@@ -29,6 +32,7 @@ class FeedFragment : Fragment() {
 
     private val viewModel: PostViewModel by activityViewModels()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -77,7 +81,15 @@ class FeedFragment : Fragment() {
 
             }
         })
-        binding.list.adapter = adapter
+        val retryListener = object : PagingLoadStateAdapter.OnInteractionListener {
+            override fun onRetry() {
+                adapter.retry()
+            }
+        }
+        binding.list.adapter = adapter.withLoadStateHeaderAndFooter(
+            header = PagingLoadStateAdapter(retryListener),
+            footer = PagingLoadStateAdapter(retryListener),
+        )
         binding.errorGroup.visibility = View.GONE
         lifecycleScope.launchWhenCreated {
             viewModel.data.collectLatest {
@@ -90,8 +102,6 @@ class FeedFragment : Fragment() {
             adapter.loadStateFlow.collectLatest {
                 binding.swiperefresh.isRefreshing =
                     it.refresh is LoadState.Loading
-                            || it.append is LoadState.Loading
-                            || it.prepend is LoadState.Loading
             }
         }
         viewModel.dataState.observe(viewLifecycleOwner) { state ->
